@@ -65,8 +65,8 @@ flrect(Flayer *l, Rectangle r)
 	rectclip(&r, lDrect);
 	l->entire = r;
 	l->scroll = insetrect(r, FLMARGIN);
-	r.min.x =
-	 l->scroll.max.x = r.min.x+FLMARGIN+FLSCROLLWID+(FLGAP-FLMARGIN);
+	l->scroll.max.x = r.min.x+FLMARGIN+FLSCROLLWID+(FLGAP-FLMARGIN);
+	r.min.x = l->scroll.max.x+4;
 	return r;
 }
 
