@@ -142,7 +142,7 @@ menu3hit(void)
 		if(!hostlock){
 			setcursor(mousectl, &bullseye);
 			buttons(Down);
-			if((mousep->buttons&4) && (l = flwhich(mousep->xy)) && getr(&r))
+			if((mousep->buttons&4) && (l = flwhich(mousep->xy)) && getr(&r, 0))
 				duplicate(l, r, l->f.font, m==Resize);
 			else
 				setcursor(mousectl, cursor);
@@ -205,7 +205,7 @@ sweeptext(int new, int tag)
 	Rectangle r;
 	Text *t;
 
-	if(getr(&r) && (t = malloc(sizeof(Text)))){
+	if(getr(&r, 1) && (t = malloc(sizeof(Text)))){
 		memset((void*)t, 0, sizeof(Text));
 		current((Flayer *)0);
 		flnew(&t->l[0], gettext, 0, (char *)t);

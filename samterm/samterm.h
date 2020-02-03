@@ -119,7 +119,7 @@ void	snarf(Text*, int);
 int	center(Flayer*, long);
 int	xmenuhit(int, Menu*);
 void	buttons(int);
-int	getr(Rectangle*);
+int	getr(Rectangle*, int);
 void	current(Flayer*);
 void	duplicate(Flayer*, Rectangle, Font*, int);
 void	startfile(Text*);

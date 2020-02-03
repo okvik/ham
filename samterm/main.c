@@ -235,31 +235,37 @@ buttons(int updown)
 		getmouse();
 }
 
-int
-getr(Rectangle *rp)
-{
-	Point p;
-	Rectangle r;
-
-	*rp = getrect(3, mousectl);
-	if(rp->max.x && rp->max.x-rp->min.x<=5 && rp->max.y-rp->min.y<=5){
-		p = rp->min;
+ int
+getr(Rectangle *rp, int full)
+ {
+ 	Point p;
+ 	Rectangle r;
+ 
+	if(full){
+ 		*rp = screen->r;
 		r = cmd.l[cmd.front].entire;
-		*rp = screen->r;
-		if(cmd.nwin==1){
-			if (p.y <= r.min.y)
-				rp->max.y = r.min.y;
-			else if (p.y >= r.max.y)
-				rp->min.y = r.max.y;
-			if (p.x <= r.min.x)
-				rp->max.x = r.min.x;
-			else if (p.x >= r.max.x)
-				rp->min.x = r.max.x;
-		}
-	}
+		rp->min.y = r.max.y;
+	}else{
+		*rp = getrect(3, mousectl);
+		if(Dx(*rp) <= 5 && Dy(*rp) <= 5){
+			p = rp->min;
+			r = cmd.l[cmd.front].entire;
+			*rp = screen->r;
+			if(cmd.nwin==1){
+				if (p.y <= r.min.y)
+					rp->max.y = r.min.y;
+				else if (p.y >= r.max.y)
+					rp->min.y = r.max.y;
+				if (p.x <= r.min.x)
+					rp->max.x = r.min.x;
+				else if (p.x >= r.max.x)
+					rp->min.x = r.max.x;
+			}
+ 		}
+ 	}
 	return rectclip(rp, screen->r) &&
-	   rp->max.x-rp->min.x>100 && rp->max.y-rp->min.y>40;
-}
+ 		rp->max.x-rp->min.x>100 && rp->max.y-rp->min.y>40;
+ } 
 
 void
 snarf(Text *t, int w)
