@@ -27,7 +27,6 @@ enum Menu2
 	Snarf,
 	Plumb,
 	Look,
-	Exch,
 	Search,
 	NMENU2 = Search,
 	Send = Search,
@@ -50,7 +49,6 @@ char	*menu2str[] = {
 	"snarf",
 	"plumb",
 	"look",
-	"<rio>",
 	0,		/* storage for last pattern */
 };
 
@@ -95,12 +93,6 @@ menu2hit(void)
 	case Plumb:
 		if(hversion > 0)
 			outTsll(Tplumb, t->tag, which->p0, which->p1);
-		break;
-
-	case Exch:
-		snarf(t, w);
-		outT0(Tstartsnarf);
-		setlock();
 		break;
 
 	case Look:
