@@ -349,6 +349,12 @@ inmesg(Tmesg type)
 		f = whichfile(inshort());
 		p0 = inlong();
 		journaln(0, p0);
+		int fd = open("/dev/snarf", OREAD);
+		if(fd < 0)
+			panic("paste: open");
+		bufreset(&snarfbuf);
+		bufload(&snarfbuf, 0, fd, &i);
+		close(fd);
 		for(l=0; l<snarfbuf.nc; l+=m){
 			m = snarfbuf.nc-l;
 			if(m>BLOCKSIZE)
@@ -576,7 +582,9 @@ void
 snarf(File *f, Posn p1, Posn p2, Buffer *buf, int emptyok)
 {
 	Posn l;
-	int i;
+	int i, fd, n;
+	String *s;
+	char *cs;
 
 	if(!emptyok && p1==p2)
 		return;
@@ -586,11 +594,23 @@ snarf(File *f, Posn p1, Posn p2, Buffer *buf, int emptyok)
 		fprint(2, "bad snarf addr p1=%ld p2=%ld f->nc=%d\n", p1, p2, f->nc); /*ZZZ should never happen, can remove */
 		p2 = f->nc;
 	}
+	fd = open("/dev/snarf", OWRITE);
+	if(fd < 0){
+		fprint(2, "snarf: %r\n");
+		return;
+	}
 	for(l=p1; l<p2; l+=i){
 		i = p2-l>BLOCKSIZE? BLOCKSIZE : p2-l;
 		bufread(f, l, genbuf, i);
-		bufinsert(buf, buf->nc, tmprstr(genbuf, i)->s, i);
+		s = tmprstr(genbuf, i);
+		cs = Strtoc(s);
+		n = strlen(cs);
+		if(write(fd, cs, n) != n)
+			fprint(2, "snarf: %r\n");
+		free(cs);
+		bufinsert(buf, buf->nc, s->s, i);
 	}
+	close(fd);
 }
 
 int
