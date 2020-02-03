@@ -304,11 +304,9 @@ cut(Text *t, int w, int save, int check)
 void
 paste(Text *t, int w)
 {
-	if(snarflen){
-		cut(t, w, 0, 0);
-		t->lock++;
-		outTsl(Tpaste, t->tag, t->l[w].p0);
-	}
+	cut(t, w, 0, 0);
+	t->lock++;
+	outTsl(Tpaste, t->tag, t->l[w].p0);
 }
 
 void
