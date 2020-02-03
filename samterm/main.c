@@ -42,7 +42,7 @@ threadmain(int argc, char *argv[])
 	scratch = alloc(100*RUNESIZE);
 	nscralloc = 100;
 	r = screen->r;
-	r.max.y = r.min.y+Dy(r)/5;
+	r.max.y = r.min.y+(6*font->height)+(3*FLMARGIN);
 	flstart(screen->clipr);
 	rinit(&cmd.rasp);
 	flnew(&cmd.l[0], gettext, 1, &cmd);
