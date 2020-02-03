@@ -138,6 +138,10 @@ menu3hit(void)
 		break;
 
 	case Zerox:
+		if(!hostlock)
+			duplicate(which, which->entire, which->f.font, 0);
+		break;
+
 	case Resize:
 		if(!hostlock){
 			setcursor(mousectl, &bullseye);
