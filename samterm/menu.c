@@ -155,34 +155,26 @@ menu3hit(void)
 		break;
 
 	case Close:
-		if(!hostlock){
-			setcursor(mousectl, &bullseye);
-			buttons(Down);
-			if((mousep->buttons&4) && (l = flwhich(mousep->xy)) && !hostlock){
-				t=(Text *)l->user1;
-				if (t->nwin>1)
-					closeup(l);
-				else if(t!=&cmd) {
-					outTs(Tclose, t->tag);
-					setlock();
-				}
-			}
-			setcursor(mousectl, cursor);
-			buttons(Up);
+		if(hostlock)
+			break;
+		if((l = flwhich(mousep->xy)) == nil)
+			break;
+		t=(Text *)l->user1;
+		if (t->nwin>1)
+			closeup(l);
+		else if(t!=&cmd) {
+			outTs(Tclose, t->tag);
+			setlock();
 		}
 		break;
 
 	case Write:
-		if(!hostlock){
-			setcursor(mousectl, &bullseye);
-			buttons(Down);
-			if((mousep->buttons&4) && (l = flwhich(mousep->xy))){
-				outTs(Twrite, ((Text *)l->user1)->tag);
-				setlock();
-			}else
-				setcursor(mousectl, cursor);
-			buttons(Up);
-		}
+		if(hostlock)
+			break;
+		if((l = flwhich(mousep->xy)) == nil)
+			break;
+		outTs(Twrite, ((Text *)l->user1)->tag);
+		setlock();
 		break;
 
 	default:
