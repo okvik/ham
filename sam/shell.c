@@ -13,21 +13,29 @@ int	cmdbufpos;
 static void
 updateenv(File *f)
 {
-	char buf[64], *p;
+	int n, fd;
+	char buf[64], *p, *e;
 	
 	if(f == nil){
 		putenv("%", "");
 		putenv("%dot", "");
 		return;
 	}
+
 	p = Strtoc(&f->name);
 	putenv("%", p);
 	free(p);
-	snprint(buf, sizeof buf, "%lud %lud %lud",
-		1+nlcount(f, 0, f->dot.r.p1),
-		f->dot.r.p1,
-		f->dot.r.p2);
-	putenv("%dot", buf);
+	
+	p = buf;
+	e = buf+sizeof(buf);
+	p = seprint(p, e, "%lud", 1+nlcount(f, 0, f->dot.r.p1));
+	p = seprint(p+1, e, "%lud", f->dot.r.p1);
+	p = seprint(p+1, e, "%lud", f->dot.r.p2);
+	n = p - buf;
+	if((fd = create("/env/%dot", OWRITE, 0666)) < 0)
+		fprint(2, "updateenv create: %r\n");
+	if(write(fd, buf, n) != n)
+		fprint(2, "updateenv write: %r\n");
 }
 
 int
