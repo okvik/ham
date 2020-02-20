@@ -119,7 +119,6 @@ void	snarf(Text*, int);
 int	center(Flayer*, long);
 int	xmenuhit(int, Menu*);
 void	buttons(int);
-int	getr(Rectangle*, int);
 void	current(Flayer*);
 void	duplicate(Flayer*, Rectangle, Font*, int);
 void	startfile(Text*);
@@ -163,6 +162,9 @@ void	flushtyping(int);
 void	dumperrmsg(int, int, int, int);
 int	screensize(int*,int*);
 void	getmouse(void);
+Rectangle inflatepoint(Point);
+Rectangle	defaultrect(void);
+int	promptrect(Rectangle*);
 
 #include "mesg.h"
 

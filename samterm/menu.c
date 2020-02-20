@@ -119,37 +119,28 @@ menu3hit(void)
 	int m, i;
 	Text *t;
 
+	l = flwhich(mousep->xy);
 	mw = -1;
 	switch(m = menuhit(3, mousectl, &menu3, nil)){
 	case -1:
 		break;
 
 	case New:
-		if(!hostlock)
-			sweeptext(1, 0);
+		if(hostlock)
+			break;
+		sweeptext(1, 0);
 		break;
 
 	case Zerox:
-		if(!hostlock)
-			duplicate(which, which->entire, which->f.font, 0);
-		break;
-
 	case Resize:
-		if(!hostlock){
-			setcursor(mousectl, &bullseye);
-			buttons(Down);
-			if((mousep->buttons&4) && (l = flwhich(mousep->xy)) && getr(&r, 0))
-				duplicate(l, r, l->f.font, m==Resize);
-			else
-				setcursor(mousectl, cursor);
-			buttons(Up);
-		}
+		if(hostlock || l == nil)
+			break;
+		if(promptrect(&r))
+			duplicate(l, r, l->f.font, m == Resize);
 		break;
 
 	case Close:
-		if(hostlock)
-			break;
-		if((l = flwhich(mousep->xy)) == nil)
+		if(hostlock || l == nil)
 			break;
 		t=(Text *)l->user1;
 		if (t->nwin>1)
@@ -161,9 +152,7 @@ menu3hit(void)
 		break;
 
 	case Write:
-		if(hostlock)
-			break;
-		if((l = flwhich(mousep->xy)) == nil)
+		if(hostlock || l == nil)
 			break;
 		outTs(Twrite, ((Text *)l->user1)->tag);
 		setlock();
@@ -186,30 +175,31 @@ menu3hit(void)
 	}
 }
 
-
 Text *
 sweeptext(int new, int tag)
 {
 	Rectangle r;
 	Text *t;
 
-	if(getr(&r, 1) && (t = malloc(sizeof(Text)))){
-		memset((void*)t, 0, sizeof(Text));
-		current((Flayer *)0);
-		flnew(&t->l[0], gettext, 0, (char *)t);
-		flinit(&t->l[0], r, font, maincols);	/*bnl*/
-		t->nwin = 1;
+	if((t = mallocz(sizeof(*t), 1)) == nil)
+		return nil;
+	if(new)
+		r = inflatepoint(mousep->xy);
+	else
+		r = defaultrect();
+	current((Flayer *)0);
+	flnew(&t->l[0], gettext, 0, (char *)t);
+	flinit(&t->l[0], r, font, maincols);	/*bnl*/
+	t->nwin = 1;
+	rinit(&t->rasp);
+	if(new)
+		startnewfile(Tstartnewfile, t);
+	else{
 		rinit(&t->rasp);
-		if(new)
-			startnewfile(Tstartnewfile, t);
-		else{
-			rinit(&t->rasp);
-			t->tag = tag;
-			startfile(t);
-		}
-		return t;
+		t->tag = tag;
+		startfile(t);
 	}
-	return 0;
+	return t;
 }
 
 int

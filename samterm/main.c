@@ -235,37 +235,65 @@ buttons(int updown)
 		getmouse();
 }
 
- int
-getr(Rectangle *rp, int full)
- {
- 	Point p;
- 	Rectangle r;
- 
-	if(full){
- 		*rp = screen->r;
-		r = cmd.l[cmd.front].entire;
-		rp->min.y = r.max.y;
-	}else{
-		*rp = getrect(3, mousectl);
-		if(Dx(*rp) <= 5 && Dy(*rp) <= 5){
-			p = rp->min;
-			r = cmd.l[cmd.front].entire;
-			*rp = screen->r;
-			if(cmd.nwin==1){
-				if (p.y <= r.min.y)
-					rp->max.y = r.min.y;
-				else if (p.y >= r.max.y)
-					rp->min.y = r.max.y;
-				if (p.x <= r.min.x)
-					rp->max.x = r.min.x;
-				else if (p.x >= r.max.x)
-					rp->min.x = r.max.x;
-			}
- 		}
- 	}
-	return rectclip(rp, screen->r) &&
- 		rp->max.x-rp->min.x>100 && rp->max.y-rp->min.y>40;
- } 
+Rectangle
+inflatepoint(Point p)
+{
+	Rectangle *c;
+	Rectangle r;
+	
+	r = screen->r;
+	c = &cmd.l[cmd.front].entire;
+	if(ptinrect(p, *c))
+		return r;
+	// L
+	if(p.x < c->min.x)
+		r.max.x = c->min.x;
+	// R
+	else if(p.x >= c->max.x)
+		r.min.x = c->max.x;
+	// M
+	else{
+		r.min.x = c->min.x;
+		r.max.x = c->max.x;
+		// A
+		if(p.y <= c->min.y)
+			r.max.y = c->min.y;
+		// B
+		else
+			r.min.y = c->max.y;
+	}
+	return r;
+}
+
+Rectangle
+defaultrect(void)
+{
+	Rectangle *c;
+	Rectangle L, M, R;
+
+	c = &cmd.l[cmd.front].entire;
+	L = inflatepoint(Pt(c->min.x - 1, c->min.y));
+	M = inflatepoint(Pt(c->min.x, c->max.y));
+	R = inflatepoint(Pt(c->max.x + 1, c->min.y));
+	if(Dx(L) >= Dx(M) && Dx(L) >= Dx(R))
+		return L;
+	else if(Dx(M) > Dx(L) && Dx(M) > Dx(R))
+		return M;
+	return R;
+}
+
+int
+promptrect(Rectangle *r)
+{
+	*r = getrect(3, mousectl);
+	if(eqrect(*r, Rect(0,0,0,0)))
+		return 0;
+	if(Dx(*r) < 5 && Dy(*r) < 5)
+		*r = inflatepoint(r->min);
+	if(rectclip(r, screen->r) == 0)
+		*r = defaultrect();
+	return 1;
+}
 
 void
 snarf(Text *t, int w)
