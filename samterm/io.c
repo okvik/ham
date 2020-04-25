@@ -48,13 +48,6 @@ initio(void)
 }
 
 void
-getmouse(void)
-{
-	if(readmouse(mousectl) < 0)
-		panic("mouse");
-}
-
-void
 mouseunblock(void)
 {
 	got &= ~(1<<RMouse);
@@ -69,7 +62,8 @@ kbdblock(void)
 int
 button(int but)
 {
-	getmouse();
+	if(readmouse(mousectl) < 0)
+		panic("mouse");
 	return mousep->buttons&(1<<(but-1));
 }
 
