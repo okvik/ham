@@ -289,7 +289,7 @@ promptrect(Rectangle *r)
 	*r = getrect(3, mousectl);
 	if(eqrect(*r, Rect(0,0,0,0)))
 		return 0;
-	if(Dx(*r) < 5 && Dy(*r) < 5)
+	if(Dx(*r) < 8*font->width && Dy(*r) < 2*font->height)
 		*r = inflatepoint(r->min);
 	if(rectclip(r, screen->r) == 0)
 		*r = defaultrect();
